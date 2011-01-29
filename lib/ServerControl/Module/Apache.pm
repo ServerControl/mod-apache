@@ -50,7 +50,11 @@ sub start {
    my ($class) = @_;
 
    my ($name, $path) = ($class->get_name, $class->get_path);
-   spawn("$path/bin/httpd-$name -d $path -f $path/conf/httpd.conf -k start");
+
+   my $defines = join " -D ", map { uc } map { /with-(.*)/ } grep { /^with-/ } %{ServerControl::Args->get};
+   $defines = "-D $defines " if($defines);
+
+   spawn("$path/bin/httpd-$name -d $path -f $path/conf/httpd.conf $defines -k start");
 }
 
 sub stop {
