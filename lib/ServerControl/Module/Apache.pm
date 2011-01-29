@@ -6,6 +6,9 @@
 
 package ServerControl::Module::Apache;
 
+use strict;
+use warnings;
+
 use ServerControl::Module;
 use ServerControl::Commons::Process;
 
