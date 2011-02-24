@@ -46,7 +46,24 @@ __PACKAGE__->Files(
 );
 
 sub help {
-   print "apache-help\n";
+   my ($class) = @_;
+
+   print __PACKAGE__ . " " . $ServerControl::Module::Apache::VERSION . "\n";
+
+   printf "  %-20s%s\n", "--path=", "The path where the instance should be created";
+   printf "  %-20s%s\n", "--user=", "Apache User";
+   printf "  %-20s%s\n", "--group=", "Apache Group";
+   printf "  %-20s%s\n", "--name=", "Instance Name";
+   printf "  %-20s%s\n", "--template=", "Which template to use";
+   printf "  %-20s%s\n", "--ip=", "Listen IP";
+   printf "  %-20s%s\n", "--port=", "Listen Port";
+   printf "  %-20s%s\n", "--serveradmin=", "ServerAdmin";
+   printf "  %-20s%s\n", "--internal_net=", "Internal (trusted) Network";
+   print "\n";
+   printf "  %-20s%s\n", "--create", "Create the instance";
+   printf "  %-20s%s\n", "--start", "Start the instance";
+   printf "  %-20s%s\n", "--stop", "Stop the instance";
+
 }
 
 sub start {
