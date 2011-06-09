@@ -1,0 +1,56 @@
+Directories:
+   Base:
+      bin:
+         name: bin
+         chmod: 755
+         user: root
+         group: root
+   Configuration:
+      conf:
+         name: etc
+         chmod: 755
+         user: root
+         group: root
+      httpdconf:
+         name: etc/httpd-conf.d
+         chmod: 755
+         user: root
+         group: root
+      vhostconf:
+         name: etc/vhost-conf.d
+         chmod: 755
+         user: root
+         group: root
+   Runtime:
+      pid:
+         name: var/run
+         chmod: 755
+         user: <%= ServerControl::Args->get->{'user'} %>
+         group: <%= ServerControl::Args->get->{'group'} %>
+      log:
+         name: var/log
+         chmod: 755
+         user: <%= ServerControl::Args->get->{'user'} %>
+         group: <%= ServerControl::Args->get->{'group'} %>
+
+Files:
+   Exec:
+      httpd:
+         name: bin/httpd-<%= __PACKAGE__->get_name %>
+         link: <%= ServerControl::Schema->get('httpd') %>
+   Base:
+      modules:
+         name: modules
+         link: <%= ServerControl::Schema->get('modules') %>
+   Configuration:
+      magic:
+         name: etc/magic
+         link: <%= ServerControl::Schema->get('magic') %>
+      mime:
+         name: etc/mime.types
+         link: <%= ServerControl::Schema->get('mime.types') %>
+      httpdconf:
+         name: etc/httpd.conf
+         call: <% sub { ServerControl::Template->parse(@_); } %>
+
+

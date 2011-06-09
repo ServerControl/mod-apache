@@ -1,0 +1,71 @@
+Directories:
+   Base:
+      bin:
+         name: bin
+         chmod: 755
+         user: root
+         group: root
+      htdocs:
+         name: htdocs
+         chmod: 755
+         user: <%= ServerControl::Args->get->{'user'} %>
+         group: <%= ServerControl::Args->get->{'group'} %>
+      error:
+         name: error
+         chmod: 755
+         user: <%= ServerControl::Args->get->{'user'} %>
+         group: <%= ServerControl::Args->get->{'group'} %>
+      tmp:
+         name: tmp
+         chmod: 755
+         user: <%= ServerControl::Args->get->{'user'} %>
+         group: <%= ServerControl::Args->get->{'group'} %>
+   Configuration:
+      conf:
+         name: conf
+         chmod: 700
+         user: root
+         group: root
+      httpdconf:
+         name: conf/httpd-conf.d
+         chmod: 755
+         user: root
+         group: root
+      vhostconf:
+         name: conf/vhost-conf.d
+         chmod: 755
+         user: root
+         group: root
+   Runtime:
+      pid:
+         name: run
+         chmod: 755
+         user: <%= ServerControl::Args->get->{'user'} %>
+         group: <%= ServerControl::Args->get->{'group'} %>
+      log:
+         name: logs
+         chmod: 755
+         user: <%= ServerControl::Args->get->{'user'} %>
+         group: <%= ServerControl::Args->get->{'group'} %>
+
+Files:
+   Exec:
+      httpd:
+         name: bin/httpd-<%= __PACKAGE__->get_name %>
+         link: <%= ServerControl::Schema->get('httpd') %>
+   Base:
+      modules:
+         name: modules
+         link: <%= ServerControl::Schema->get('modules') %>
+   Configuration:
+      magic:
+         name: conf/magic
+         link: <%= ServerControl::Schema->get('magic') %>
+      mime:
+         name: conf/mime.types
+         link: <%= ServerControl::Schema->get('mime.types') %>
+      httpdconf:
+         name: conf/httpd.conf
+         call: <% sub { ServerControl::Template->parse(@_); } %>
+
+
