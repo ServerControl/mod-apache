@@ -1,5 +1,5 @@
 lib/ServerControl/Module/Apache.pm
 lib/ServerControl/Schema/Debian/Apache.pm
+lib/ServerControl/Schema/Fedora/Apache.pm
 lib/ServerControl/Schema/MacPorts/Apache.pm
 Makefile.PL
-MANIFEST

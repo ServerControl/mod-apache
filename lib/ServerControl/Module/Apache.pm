@@ -55,10 +55,6 @@ sub help {
    printf "  %-20s%s\n", "--group=", "Apache Group";
    printf "  %-20s%s\n", "--name=", "Instance Name";
    printf "  %-20s%s\n", "--template=", "Which template to use";
-   printf "  %-20s%s\n", "--ip=", "Listen IP";
-   printf "  %-20s%s\n", "--port=", "Listen Port";
-   printf "  %-20s%s\n", "--serveradmin=", "ServerAdmin";
-   printf "  %-20s%s\n", "--internal_net=", "Internal (trusted) Network";
    print "\n";
    printf "  %-20s%s\n", "--create", "Create the instance";
    printf "  %-20s%s\n", "--start", "Start the instance";
@@ -74,35 +70,52 @@ sub start {
    my $defines = join " -D ", map { uc } map { /with-(.*)/ } grep { /^with-/ } %{ServerControl::Args->get};
    $defines = "-D $defines " if($defines);
 
-   spawn("$path/bin/httpd-$name -d $path -f $path/conf/httpd.conf $defines -k start");
+   my $exec_file   = ServerControl::FsLayout->get_file("Exec", "httpd");
+   my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
+
+   spawn("$path/$exec_file -d $path -f $path/$config_file $defines -k start");
 }
 
 sub stop {
    my ($class) = @_;
 
    my ($name, $path) = ($class->get_name, $class->get_path);
-   spawn("$path/bin/httpd-$name -d $path -f $path/conf/httpd.conf -k stop");
+
+   my $exec_file = ServerControl::FsLayout->get_file("Exec", "httpd");
+   my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
+
+   spawn("$path/$exec_file -d $path -f $path/$config_file -k stop");
 }
 
 sub restart {
    my ($class) = @_;
 
    my ($name, $path) = ($class->get_name, $class->get_path);
-   spawn("$path/bin/httpd-$name -d $path -f $path/conf/httpd.conf -k restart");
+
+   my $exec_file = ServerControl::FsLayout->get_file("Exec", "httpd");
+   my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
+
+   spawn("$path/$exec_file -d $path -f $path/$config_file -k restart");
 }
 
 sub reload {
    my ($class) = @_;
 
    my ($name, $path) = ($class->get_name, $class->get_path);
-   spawn("$path/bin/httpd-$name -d $path -f $path/conf/httpd.conf -k graceful");
+
+   my $exec_file = ServerControl::FsLayout->get_file("Exec", "httpd");
+   my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
+
+   spawn("$path/$exec_file -d $path -f $path/$config_file -k graceful");
 }
 
 sub status {
    my ($class) = @_;
 
    my ($name, $path) = ($class->get_name, $class->get_path);
-   if(-f $path . '/run/httpd.pid') { return 1; }
+   my $run_file = ServerControl::FsLayout->get_directory("Runtime", "pid");
+
+   if(-f $path . '/' . $run_file . '/httpd.pid') { return 1; }
 }
 
 
