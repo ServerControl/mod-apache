@@ -5,6 +5,11 @@ Directories:
          chmod: 755
          user: root
          group: root
+      htdocs:
+         name: var/htdocs
+         chmod: 755
+         user: <%= ServerControl::Args->get->{'user'} %>
+         group: <%= ServerControl::Args->get->{'group'} %>
    Configuration:
       conf:
          name: etc
