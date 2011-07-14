@@ -14,7 +14,7 @@ use ServerControl::Commons::Process;
 
 use base qw(ServerControl::Module);
 
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 use Data::Dumper;
 
