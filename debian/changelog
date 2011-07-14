@@ -1,3 +1,9 @@
+servercontrol-mod-apache (0.94) unstable; urgency=low
+  * fixed bug with no configuration file at all
+
+ -- Jan Gehring <jan.gehring@gmail.com>  Thu, 14 Jul 2011 17:00:00 +0200
+
+
 servercontrol-mod-apache (0.93) unstable; urgency=low
   * updated to new fslayout
 

@@ -50,7 +50,12 @@ sub start {
    my $exec_file   = ServerControl::FsLayout->get_file("Exec", "httpd");
    my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
 
-   spawn("$path/$exec_file -d $path -f $path/$config_file $defines -k start");
+   if($config_file) {
+      spawn("$path/$exec_file -d $path -f $path/$config_file $defines -k start");
+   }
+   else {
+      spawn("$path/$exec_file -d $path $defines -k start");
+   }
 }
 
 sub stop {
