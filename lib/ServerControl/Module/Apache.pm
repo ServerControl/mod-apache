@@ -44,7 +44,12 @@ sub start {
 
    my ($name, $path) = ($class->get_name, $class->get_path);
 
-   my $defines = join " -D ", map { uc } map { /with-(.*)/ } grep { /^with-/ } %{ServerControl::Args->get};
+
+   my $defines = join " -D ",
+                     map { uc($_) . (ServerControl::Args->get->{"with-$_"} eq "1"?"":"=".ServerControl::Args->get->{"with-$_"}) }
+                        map { /with-(.*)/ }
+                           grep { /^with-/ } %{ServerControl::Args->get};
+
    $defines = "-D $defines " if($defines);
 
    my $exec_file   = ServerControl::FsLayout->get_file("Exec", "httpd");
