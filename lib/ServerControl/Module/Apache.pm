@@ -15,7 +15,7 @@ use ServerControl::Exception::SyntaxError;
 
 use base qw(ServerControl::Module);
 
-our $VERSION = '0.94';
+our $VERSION = '0.106';
 
 use Data::Dumper;
 
