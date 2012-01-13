@@ -147,6 +147,7 @@ sub check {
    spawn("$path/$exec_file -d $path -f $path/$config_file $defines $options -t");
 
    if($? == 0) {
+      ServerControl->say("Configuration checked. All seems fine.");
       return 1;
    }
 
