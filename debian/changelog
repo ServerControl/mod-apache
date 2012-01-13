@@ -1,3 +1,8 @@
+servercontrol-mod-apache (0.107) unstable; urgency=low
+  * fixed checking of configuration
+
+ -- Jan Gehring <jan.gehring@gmail.com>  Fri, 13 Jan 2012 13:00:00 +0200
+
 servercontrol-mod-apache (0.106) unstable; urgency=low
   * added check function
   * added options parameter
