@@ -15,7 +15,7 @@ use ServerControl::Exception::SyntaxError;
 
 use base qw(ServerControl::Module);
 
-our $VERSION = '0.107';
+our $VERSION = '0.109';
 
 use Data::Dumper;
 
@@ -52,16 +52,11 @@ sub start {
       die(ServerControl::Exception::SyntaxError->new(message => 'Syntax Error in Configuration File. Please Check.'));
    }
 
-   my $defines = join " -D ",
-                     map { uc($_) . (ServerControl::Args->get->{"with-$_"} eq "1"?"":"=".ServerControl::Args->get->{"with-$_"}) }
-                        map { /with-(.*)/ }
-                           grep { /^with-/ } %{ServerControl::Args->get};
-
-   $defines = "-D $defines " if($defines);
-
    my $exec_file   = ServerControl::FsLayout->get_file("Exec", "httpd");
    my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
-   my $options     = ServerControl::Args->get->{"options"} || "";
+
+   my $options     = _get_options();
+   my $defines     = _get_defines();
 
    if($config_file) {
       spawn("$path/$exec_file -d $path -f $path/$config_file $defines $options -k start");
@@ -81,16 +76,11 @@ sub stop {
       die(ServerControl::Exception::SyntaxError->new(message => 'Syntax Error in Configuration File. Please Check.'));
    }
 
-   my $defines = join " -D ",
-                     map { uc($_) . (ServerControl::Args->get->{"with-$_"} eq "1"?"":"=".ServerControl::Args->get->{"with-$_"}) }
-                        map { /with-(.*)/ }
-                           grep { /^with-/ } %{ServerControl::Args->get};
-
-   $defines = "-D $defines " if($defines);
-
    my $exec_file   = ServerControl::FsLayout->get_file("Exec", "httpd");
    my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
-   my $options     = ServerControl::Args->get->{"options"} || "";
+
+   my $options     = _get_options();
+   my $defines     = _get_defines();
 
    spawn("$path/$exec_file -d $path -f $path/$config_file $defines $options -k stop");
 }
@@ -105,16 +95,12 @@ sub restart {
       die(ServerControl::Exception::SyntaxError->new(message => 'Syntax Error in Configuration File. Please Check.'));
    }
 
-   my $defines = join " -D ",
-                     map { uc($_) . (ServerControl::Args->get->{"with-$_"} eq "1"?"":"=".ServerControl::Args->get->{"with-$_"}) }
-                        map { /with-(.*)/ }
-                           grep { /^with-/ } %{ServerControl::Args->get};
-
-   $defines = "-D $defines " if($defines);
-
    my $exec_file   = ServerControl::FsLayout->get_file("Exec", "httpd");
    my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
-   my $options     = ServerControl::Args->get->{"options"} || "";
+
+   my $options     = _get_options();
+   my $defines     = _get_defines();
+
 
    spawn("$path/$exec_file -d $path -f $path/$config_file $defines $options -k restart");
 }
@@ -129,16 +115,11 @@ sub reload {
       die(ServerControl::Exception::SyntaxError->new(message => 'Syntax Error in Configuration File. Please Check.'));
    }
 
-   my $defines = join " -D ",
-                     map { uc($_) . (ServerControl::Args->get->{"with-$_"} eq "1"?"":"=".ServerControl::Args->get->{"with-$_"}) }
-                        map { /with-(.*)/ }
-                           grep { /^with-/ } %{ServerControl::Args->get};
-
-   $defines = "-D $defines " if($defines);
-
    my $exec_file   = ServerControl::FsLayout->get_file("Exec", "httpd");
    my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
-   my $options     = ServerControl::Args->get->{"options"} || "";
+
+   my $options     = _get_options();
+   my $defines     = _get_defines();
 
    spawn("$path/$exec_file -d $path -f $path/$config_file $defines $options -k graceful");
 }
@@ -157,17 +138,11 @@ sub check {
 
    my ($name, $path) = ($class->get_name, $class->get_path);
 
-   my $defines = join " -D ",
-                     map { uc($_) . (ServerControl::Args->get->{"with-$_"} eq "1"?"":"=".ServerControl::Args->get->{"with-$_"}) }
-                        map { /with-(.*)/ }
-                           grep { /^with-/ } %{ServerControl::Args->get};
-
-   $defines = "-D $defines " if($defines);
-
    my $exec_file   = ServerControl::FsLayout->get_file("Exec", "httpd");
    my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
-   my $options     = ServerControl::Args->get->{"options"} || "";
 
+   my $options     = _get_options();
+   my $defines     = _get_defines();
 
    spawn("$path/$exec_file -d $path -f $path/$config_file $defines $options -t");
 
@@ -176,6 +151,23 @@ sub check {
    }
 
    return 0;
+}
+
+# extract all with-* parameters from instance.conf
+sub _get_defines {
+   my $defines = join " -D ",
+                     map { uc($_) . (ServerControl::Args->get->{"with-$_"} eq "1"?"":"=".ServerControl::Args->get->{"with-$_"}) }
+                        map { /with-(.*)/ }
+                           grep { /^with-/ } %{ServerControl::Args->get};
+  
+   $defines = "-D $defines " if($defines);
+   return $defines;
+}
+
+# get all options from instance.conf
+sub _get_options {
+   my $options     = ServerControl::Args->get->{"options"} || "";
+   return $options;
 }
 
 1;
