@@ -15,7 +15,7 @@ use ServerControl::Exception::SyntaxError;
 
 use base qw(ServerControl::Module);
 
-our $VERSION = '0.106';
+our $VERSION = '0.107';
 
 use Data::Dumper;
 
@@ -133,10 +133,19 @@ sub check {
 
    my ($name, $path) = ($class->get_name, $class->get_path);
 
-   my $exec_file = ServerControl::FsLayout->get_file("Exec", "httpd");
-   my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
+   my $defines = join " -D ",
+                     map { uc($_) . (ServerControl::Args->get->{"with-$_"} eq "1"?"":"=".ServerControl::Args->get->{"with-$_"}) }
+                        map { /with-(.*)/ }
+                           grep { /^with-/ } %{ServerControl::Args->get};
 
-   spawn("$path/$exec_file -d $path -f $path/$config_file -t");
+   $defines = "-D $defines " if($defines);
+
+   my $exec_file   = ServerControl::FsLayout->get_file("Exec", "httpd");
+   my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
+   my $options     = ServerControl::Args->get->{"options"} || "";
+
+
+   spawn("$path/$exec_file -d $path -f $path/$config_file $defines $options -t");
 
    if($? == 0) {
       return 1;
