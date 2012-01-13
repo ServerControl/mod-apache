@@ -11,6 +11,7 @@ use warnings;
 
 use ServerControl::Module;
 use ServerControl::Commons::Process;
+use ServerControl::Exception::SyntaxError;
 
 use base qw(ServerControl::Module);
 
@@ -20,6 +21,7 @@ use Data::Dumper;
 
 __PACKAGE__->Parameter(
    help  => { isa => 'bool', call => sub { __PACKAGE__->help; } },
+   check => { isa => 'bool', call => sub { __PACKAGE__->check; } },
 );
 
 sub help {
@@ -45,6 +47,10 @@ sub start {
 
    my ($name, $path) = ($class->get_name, $class->get_path);
 
+   unless($class->check()) {
+      ServerControl->say("Error in configurationfile. Won't start.");
+      die(ServerControl::Exception::SyntaxError->new(message => 'Syntax Error in Configuration File. Please Check.'));
+   }
 
    my $defines = join " -D ",
                      map { uc($_) . (ServerControl::Args->get->{"with-$_"} eq "1"?"":"=".ServerControl::Args->get->{"with-$_"}) }
@@ -70,6 +76,11 @@ sub stop {
 
    my ($name, $path) = ($class->get_name, $class->get_path);
 
+   unless($class->check()) {
+      ServerControl->say("Error in configurationfile. Won't stop.");
+      die(ServerControl::Exception::SyntaxError->new(message => 'Syntax Error in Configuration File. Please Check.'));
+   }
+
    my $exec_file = ServerControl::FsLayout->get_file("Exec", "httpd");
    my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
 
@@ -81,6 +92,11 @@ sub restart {
 
    my ($name, $path) = ($class->get_name, $class->get_path);
 
+   unless($class->check()) {
+      ServerControl->say("Error in configurationfile. Won't restart.");
+      die(ServerControl::Exception::SyntaxError->new(message => 'Syntax Error in Configuration File. Please Check.'));
+   }
+
    my $exec_file = ServerControl::FsLayout->get_file("Exec", "httpd");
    my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
 
@@ -91,6 +107,11 @@ sub reload {
    my ($class) = @_;
 
    my ($name, $path) = ($class->get_name, $class->get_path);
+
+   unless($class->check()) {
+      ServerControl->say("Error in configurationfile. Won't reload.");
+      die(ServerControl::Exception::SyntaxError->new(message => 'Syntax Error in Configuration File. Please Check.'));
+   }
 
    my $exec_file = ServerControl::FsLayout->get_file("Exec", "httpd");
    my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
@@ -107,6 +128,21 @@ sub status {
    if(-f $path . '/' . $run_file . '/httpd.pid') { return 1; }
 }
 
+sub check {
+   my ($class) = @_;
 
+   my ($name, $path) = ($class->get_name, $class->get_path);
+
+   my $exec_file = ServerControl::FsLayout->get_file("Exec", "httpd");
+   my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
+
+   spawn("$path/$exec_file -d $path -f $path/$config_file -t");
+
+   if($? == 0) {
+      return 1;
+   }
+
+   return 0;
+}
 
 1;
