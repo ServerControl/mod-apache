@@ -32,6 +32,7 @@ sub help {
    printf "  %-20s%s\n", "--group=", "Apache Group";
    printf "  %-20s%s\n", "--name=", "Instance Name";
    printf "  %-20s%s\n", "--template=", "Which template to use";
+   printf "  %-20s%s\n", "--options=", "Additional options for httpd like '-e info -E error.log'\n";
    print "\n";
    printf "  %-20s%s\n", "--create", "Create the instance";
    printf "  %-20s%s\n", "--start", "Start the instance";
@@ -54,12 +55,13 @@ sub start {
 
    my $exec_file   = ServerControl::FsLayout->get_file("Exec", "httpd");
    my $config_file = ServerControl::FsLayout->get_file("Configuration", "httpdconf");
+   my $options     = ServerControl::Args->get->{"options"} || "";
 
    if($config_file) {
-      spawn("$path/$exec_file -d $path -f $path/$config_file $defines -k start");
+      spawn("$path/$exec_file -d $path -f $path/$config_file $defines $options -k start");
    }
    else {
-      spawn("$path/$exec_file -d $path $defines -k start");
+      spawn("$path/$exec_file -d $path $defines $options -k start");
    }
 }
 
